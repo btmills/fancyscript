@@ -6,9 +6,9 @@ var jspp = require('../fancyscript.js');
 
 process.argv.slice(2).forEach(function (arg) {
 	try {
-		var outfile = /^(.*)\.jspp$/.exec(arg);
+		var outfile = /^(.*)\.fs$/.exec(arg);
 		if (!(outfile && outfile.length && outfile.length >= 2)) {
-			throw new Error('Expected a jspp file');
+			throw new Error('Expected a fs file');
 		}
 		outfile = outfile[1] + '.js';
 
