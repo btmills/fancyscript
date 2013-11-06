@@ -1,0 +1,8 @@
+{
+	"name": "jspp",
+	"version": "0.0.1",
+	"dependencies": {
+		"acorn": "https://github.com/btmills/acorn/tarball/master",
+		"escodegen": "~0.0.28"
+	}
+}

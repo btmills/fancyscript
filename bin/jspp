@@ -1,0 +1,24 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var fs = require('fs');
+var jspp = require('../jspp.js');
+
+process.argv.slice(2).forEach(function (arg) {
+	try {
+		var outfile = /^(.*)\.jspp$/.exec(arg);
+		if (!(outfile && outfile.length && outfile.length >= 2)) {
+			throw new Error('Expected a jspp file');
+		}
+		outfile = outfile[1] + '.js';
+
+		var src = fs.readFileSync(arg, 'utf8');
+
+		var js = jspp.compile(src);
+
+		fs.writeFileSync(outfile, js, { encoding: 'utf8' });
+	} catch (ex) {
+		console.error(ex);
+		process.exit(1);
+	}
+});
