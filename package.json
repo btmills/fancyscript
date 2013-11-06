@@ -1,9 +1,9 @@
 {
-	"name": "jspp",
+	"name": "fancyscript",
 	"version": "0.0.1",
-	"main": "./jspp.js",
+	"main": "./fancyscript.js",
 	"bin": {
-		"jspp": "./bin/jspp"
+		"fancy": "./bin/fancyscript"
 	},
 	"dependencies": {
 		"acorn": "https://github.com/btmills/acorn/tarball/master",
