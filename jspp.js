@@ -94,13 +94,31 @@
 		return node;
 	}
 
+	function compileAutomaticReturn (node) {
+		if (node.body.body.length) {
+			var last = node.body.body[node.body.body.length - 1];
+			if (last.type === 'ExpressionStatement') {
+				node.body.body[node.body.body.length - 1] = {
+					type: 'ReturnStatement',
+					argument: last.expression
+				};
+			}
+		}
+		return node;
+	}
+
 	var compile = function (src) {
 		var ast = acorn.parse(src);
 		ast = estraverse.replace(ast, {
 			enter: function (node) {
+				var res = node;
 				if ((node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') && node.rest !== null) {
-					return compileRestParameter(node);
+					res = compileRestParameter(res);
 				}
+				if (node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
+					res = compileAutomaticReturn(res);
+				}
+				return res;
 			}
 		});
 		return escodegen.generate(ast);
