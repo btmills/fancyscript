@@ -1,14 +1,14 @@
 {
-	"name": "fancyscript",
-	"version": "0.0.1",
-	"main": "./fancyscript.js",
-	"bin": {
-		"fancy": "./bin/fancyscript"
-	},
-	"dependencies": {
-		"acorn": "https://github.com/btmills/acorn/tarball/master",
-		"astgen": "~0.0.3",
-		"escodegen": "~0.0.28",
-		"estraverse": "~1.3.2"
-	}
+  "name": "fancyscript",
+  "version": "0.0.2",
+  "main": "./fancyscript.js",
+  "bin": {
+    "fancy": "./bin/fancyscript"
+  },
+  "dependencies": {
+    "acorn": "https://github.com/btmills/acorn/tarball/master",
+    "astgen": "~0.0.3",
+    "escodegen": "~0.0.28",
+    "estraverse": "~1.3.2"
+  }
 }
