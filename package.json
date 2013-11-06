@@ -1,6 +1,6 @@
 {
   "name": "fancyscript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./fancyscript.js",
   "bin": {
     "fancy": "./bin/fancyscript"
