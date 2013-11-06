@@ -2,7 +2,7 @@
 
 var path = require('path');
 var fs = require('fs');
-var jspp = require('../jspp.js');
+var jspp = require('../fancyscript.js');
 
 process.argv.slice(2).forEach(function (arg) {
 	try {
