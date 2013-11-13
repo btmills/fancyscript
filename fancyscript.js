@@ -63,6 +63,8 @@
 	var yieldExpression = astgen.yieldExpression;
 
 	function compileRestParameter (node) {
+		if (node.rest === null) return node;
+
 		var rest = node.rest.name;
 		node.rest = null;
 		var length = node.params.length;
@@ -95,15 +97,14 @@
 	}
 
 	function compileAutomaticReturn (node) {
-		if (node.body.body.length) {
-			var last = node.body.body[node.body.body.length - 1];
-			if (last.type === 'ExpressionStatement') {
-				node.body.body[node.body.body.length - 1] = {
-					type: 'ReturnStatement',
-					argument: last.expression
-				};
-			}
-		}
+		if (!node.body.body.length ||
+			node.body.body[node.body.body.length - 1].type !== 'ExpressionStatement')
+			return node;
+
+		node.body.body[node.body.body.length - 1] = {
+			type: 'ReturnStatement',
+			argument: node.body.body[node.body.body.length - 1].expression
+		};
 		return node;
 	}
 
@@ -112,11 +113,11 @@
 		ast = estraverse.replace(ast, {
 			enter: function (node) {
 				var res = node;
-				if ((node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') && node.rest !== null) {
-					res = compileRestParameter(res);
-				}
-				if (node.type === 'FunctionExpression' || node.type === 'FunctionDeclaration') {
-					res = compileAutomaticReturn(res);
+				switch (node.type) {
+					case 'FunctionExpression': // Fall through
+					case 'FunctionDeclaration':
+						res = compileRestParameter(res);
+						res = compileAutomaticReturn(res);
 				}
 				return res;
 			}
