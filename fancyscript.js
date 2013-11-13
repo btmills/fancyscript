@@ -4,7 +4,7 @@
 	} else if (typeof exports === 'object') {
 		module.exports = factory.call({}, require('acorn'), require('astgen'), require('escodegen'), require('estraverse'));
 	} else {
-		root.jspp = factory.call({}, root.acorn, root.astgen, root.escodegen, root.estraverse);
+		root.fancyscript = factory.call({}, root.acorn, root.astgen, root.escodegen, root.estraverse);
 	}
 })(this, function (acorn, ast, escodegen, estraverse) {
 
