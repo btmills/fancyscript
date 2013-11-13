@@ -84,3 +84,7 @@ function isEven(x) {
 isEven(2, 4, 6, 7); // false
 isEven(2, 4, 6, 8); // true
 ```
+
+## License
+
+Licensed under the [BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause), the full text of which can be read in [LICENSE](LICENSE).
