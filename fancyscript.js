@@ -49,6 +49,7 @@
 	var returnStatement = astgen.returnStatement;
 	var sequenceExpression = astgen.sequenceExpression;
 	var sourceLocation = astgen.sourceLocation;
+	var spreadExpression = astgen.spreadExpression;
 	var switchCase = astgen.switchCase;
 	var switchStatement = astgen.switchStatement;
 	var thisExpression = astgen.thisExpression;
@@ -112,17 +113,103 @@
 		return node;
 	}
 
+	function compileSpreadExpressionArgument (node) {
+		/*
+		 * callee(a, ...b, c)
+		 * => callee.apply(callee, Array.prototype.concat([a], b, [c]))
+		 * callee.call(scope, a, ...b, c)
+		 * => callee.apply(scope, Array.prototype.concat([a], b, [c]))
+		 * callee.apply not supported
+		 * new Thing(a, ...b, c)
+		 * => new (Function.prototype.bind.apply(Thing, [null].concat([a], b, [c])))
+		 */
+		if (!node.arguments.some(function (arg) {
+			return arg.type === 'SpreadExpression';
+		})) {
+			return node;
+		}
+
+		var args = [];
+		node.arguments.forEach(function (arg) {
+			if (arg.type === 'SpreadExpression') {
+				args.push(astgen.validate(arg.argument));
+			} else {
+				args.push(arrayExpression([astgen.validate(arg)]));
+			}
+		});
+
+		if (node.type === 'CallExpression') {
+			return callExpression(
+				memberExpression(
+					astgen.validate(node.callee),
+					identifier('apply'),
+					false
+				),
+				[
+					astgen.validate(node.callee),
+					callExpression(
+						memberExpression(
+							arrayExpression([]),
+							identifier('concat'),
+							false
+						),
+						args
+					)
+				]
+			);
+		} else if (node.type === 'NewExpression') {
+			return newExpression(
+				callExpression(
+					memberExpression(
+						memberExpression(
+							memberExpression(
+								identifier('Function'),
+								identifier('prototype'),
+								false
+							),
+							identifier('bind'),
+							false
+						),
+						identifier('apply'),
+						false
+					),
+					[
+						astgen.validate(node.callee),
+						callExpression(
+							memberExpression(
+								arrayExpression([
+									literal(null)
+								]),
+								identifier('concat'),
+								false
+							),
+							args
+						)
+					]
+				),
+				[]
+			);
+		}
+	}
+
 	var compile = function (src) {
 		var ast = acorn.parse(src);
 		ast = estraverse.replace(ast, {
 			enter: function (node) {
 				var res = node;
+
 				switch (node.type) {
 					case 'FunctionExpression': // Fall through
 					case 'FunctionDeclaration':
 						res = compileRestParameter(res);
 						res = compileAutomaticReturn(res);
+						break;
+					case 'CallExpression': // Fall through
+					case 'NewExpression':
+						res = compileSpreadExpressionArgument(res);
+						break;
 				}
+
 				return res;
 			}
 		});
