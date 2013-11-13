@@ -97,14 +97,18 @@
 	}
 
 	function compileAutomaticReturn (node) {
-		if (!node.body.body.length ||
-			node.body.body[node.body.body.length - 1].type !== 'ExpressionStatement')
+		var body = node.body.body; // Function.body/BlockStatement.body
+
+		if (!body.length ||
+			body[body.length - 1].type !== 'ExpressionStatement')
 			return node;
 
-		node.body.body[node.body.body.length - 1] = {
-			type: 'ReturnStatement',
-			argument: node.body.body[node.body.body.length - 1].expression
-		};
+		body[body.length - 1] = returnStatement(
+			astgen.validate(
+				body[body.length - 1].expression
+			)
+		);
+
 		return node;
 	}
 
