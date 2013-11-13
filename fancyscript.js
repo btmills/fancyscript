@@ -6,62 +6,9 @@
 	} else {
 		root.jspp = factory.call({}, root.acorn, root.astgen, root.escodegen, root.estraverse);
 	}
-})(this, function (acorn, astgen, escodegen, estraverse) {
+})(this, function (acorn, ast, escodegen, estraverse) {
 
 	'use strict';
-
-	var arrayExpression = astgen.arrayExpression;
-	var arrayPattern = astgen.arrayPattern;
-	var arrowExpression = astgen.arrowExpression;
-	var assignmentExpression = astgen.assignmentExpression;
-	var binaryExpression = astgen.binaryExpression;
-	var blockStatement = astgen.blockStatement;
-	var breakStatement = astgen.breakStatement;
-	var callExpression = astgen.callExpression;
-	var catchClause = astgen.catchClause;
-	var comprehensionBlock = astgen.comprehensionBlock;
-	var comprehensionExpression = astgen.comprehensionExpression;
-	var conditionalExpression = astgen.conditionalExpression;
-	var continueStatement = astgen.continueStatement;
-	var debuggerStatement = astgen.debuggerStatement;
-	var doWhileStatement = astgen.doWhileStatement;
-	var emptyStatement = astgen.emptyStatement;
-	var expressionStatement = astgen.expressionStatement;
-	var forStatement = astgen.forStatement;
-	var forInStatement = astgen.forInStatement;
-	var forOfStatement = astgen.forOfStatement;
-	var functionDeclaration = astgen.functionDeclaration;
-	var functionExpression = astgen.functionExpression;
-	var generatorExpression = astgen.generatorExpression;
-	var identifier = astgen.identifier;
-	var ifStatement = astgen.ifStatement;
-	var labeledStatement = astgen.labeledStatement;
-	var literal = astgen.literal;
-	var logicalExpression = astgen.logicalExpression;
-	var memberExpression = astgen.memberExpression;
-	var newExpression = astgen.newExpression;
-	var objectExpression = astgen.objectExpression;
-	var objectPattern = astgen.objectPattern;
-	var position = astgen.position;
-	var program = astgen.program;
-	var property = astgen.property;
-	var propertyPattern = astgen.propertyPattern;
-	var returnStatement = astgen.returnStatement;
-	var sequenceExpression = astgen.sequenceExpression;
-	var sourceLocation = astgen.sourceLocation;
-	var spreadExpression = astgen.spreadExpression;
-	var switchCase = astgen.switchCase;
-	var switchStatement = astgen.switchStatement;
-	var thisExpression = astgen.thisExpression;
-	var throwStatement = astgen.throwStatement;
-	var tryStatement = astgen.tryStatement;
-	var unaryExpression = astgen.unaryExpression;
-	var updateExpression = astgen.updateExpression;
-	var variableDeclaration = astgen.variableDeclaration;
-	var variableDeclarator = astgen.variableDeclarator;
-	var whileStatement = astgen.whileStatement;
-	var withStatement = astgen.withStatement;
-	var yieldExpression = astgen.yieldExpression;
 
 	function compileRestParameter (node) {
 		if (node.rest === null) return node;
@@ -69,27 +16,27 @@
 		var rest = node.rest.name;
 		node.rest = null;
 		var length = node.params.length;
-		node.body.body.unshift(variableDeclaration(
+		node.body.body.unshift(ast.variableDeclaration(
 			'var',
-			[ variableDeclarator(
-				identifier(rest),
-				callExpression(
-					memberExpression(
-						memberExpression(
-							memberExpression(
-								identifier('Array'),
-								identifier('prototype'),
+			[ ast.variableDeclarator(
+				ast.identifier(rest),
+				ast.callExpression(
+					ast.memberExpression(
+						ast.memberExpression(
+							ast.memberExpression(
+								ast.identifier('Array'),
+								ast.identifier('prototype'),
 								false
 							),
-							identifier('slice'),
+							ast.identifier('slice'),
 							false
 						),
-						identifier('call'),
+						ast.identifier('call'),
 						false
 					),
 					[
-						identifier('arguments'),
-						literal(length)
+						ast.identifier('arguments'),
+						ast.literal(length)
 					]
 				)
 			) ]
@@ -104,10 +51,8 @@
 			body[body.length - 1].type !== 'ExpressionStatement')
 			return node;
 
-		body[body.length - 1] = returnStatement(
-			astgen.validate(
-				body[body.length - 1].expression
-			)
+		body[body.length - 1] = ast.returnStatement(
+			ast.validate(body[body.length - 1].expression)
 		);
 
 		return node;
@@ -132,25 +77,27 @@
 		var args = [];
 		node.arguments.forEach(function (arg) {
 			if (arg.type === 'SpreadExpression') {
-				args.push(astgen.validate(arg.argument));
+				args.push(ast.validate(arg.argument));
 			} else {
-				args.push(arrayExpression([astgen.validate(arg)]));
+				args.push(ast.arrayExpression([
+					ast.validate(arg)
+				]));
 			}
 		});
 
 		if (node.type === 'CallExpression') {
-			return callExpression(
-				memberExpression(
-					astgen.validate(node.callee),
-					identifier('apply'),
+			return ast.callExpression(
+				ast.memberExpression(
+					ast.validate(node.callee),
+					ast.identifier('apply'),
 					false
 				),
 				[
-					astgen.validate(node.callee),
-					callExpression(
-						memberExpression(
-							arrayExpression([]),
-							identifier('concat'),
+					ast.validate(node.callee),
+					ast.callExpression(
+						ast.memberExpression(
+							ast.arrayExpression([]),
+							ast.identifier('concat'),
 							false
 						),
 						args
@@ -158,29 +105,29 @@
 				]
 			);
 		} else if (node.type === 'NewExpression') {
-			return newExpression(
-				callExpression(
-					memberExpression(
-						memberExpression(
-							memberExpression(
-								identifier('Function'),
-								identifier('prototype'),
+			return ast.newExpression(
+				ast.callExpression(
+					ast.memberExpression(
+						ast.memberExpression(
+							ast.memberExpression(
+								ast.identifier('Function'),
+								ast.identifier('prototype'),
 								false
 							),
-							identifier('bind'),
+							ast.identifier('bind'),
 							false
 						),
-						identifier('apply'),
+						ast.identifier('apply'),
 						false
 					),
 					[
-						astgen.validate(node.callee),
-						callExpression(
-							memberExpression(
-								arrayExpression([
-									literal(null)
+						ast.validate(node.callee),
+						ast.callExpression(
+							ast.memberExpression(
+								ast.arrayExpression([
+									ast.literal(null)
 								]),
-								identifier('concat'),
+								ast.identifier('concat'),
 								false
 							),
 							args
@@ -193,8 +140,8 @@
 	}
 
 	var compile = function (src) {
-		var ast = acorn.parse(src);
-		ast = estraverse.replace(ast, {
+		var tree = acorn.parse(src);
+		tree = estraverse.replace(tree, {
 			enter: function (node) {
 				var res = node;
 
@@ -213,7 +160,7 @@
 				return res;
 			}
 		});
-		return escodegen.generate(ast);
+		return escodegen.generate(tree);
 	};
 
 	return {
