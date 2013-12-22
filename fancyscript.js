@@ -139,7 +139,7 @@
 		}
 	}
 
-	var compile = function (src) {
+	var compile = function (src, options) {
 		var tree = acorn.parse(src);
 		tree = estraverse.replace(tree, {
 			enter: function (node) {
