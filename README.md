@@ -1,5 +1,7 @@
 # FancyScript
 
+*Fancy JavaScript*
+
 FancyScript aims to make developing in JavaScript easier and more powerful while remaining "just JavaScript". For a completely different approach with diverse syntax rules, and in the latter case, a powerful standard library, look toward [CoffeeScript](https://github.com/jashkenas/coffee-script/) or [ClojureScript](https://github.com/clojure/clojurescript). FancyScript compiles to plain ES5 JavaScript. Thanks [@tarebyte](https://github.com/tarebyte) for the name.
 
 ## Usage
@@ -26,7 +28,7 @@ function hello () {
 
 ### Automatic return values
 
-If the last statement of a function is an epression contained in an ExpressionStatement, it is automatically returned.
+If the last statement of a function is an expression contained in an ExpressionStatement, it is automatically returned.
 
 ```JavaScript
 fn isEven (x) { x % 2 === 0 }
