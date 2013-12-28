@@ -1,12 +1,14 @@
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
-		define(['acorn', 'astgen', 'escodegen', 'estraverse'], factory);
+		define(['ast-types', 'escodegen', 'esprima', 'estraverse'], factory);
 	} else if (typeof exports === 'object') {
-		module.exports = factory.call({}, require('acorn'), require('astgen'), require('escodegen'), require('estraverse'));
+		module.exports = factory.call({}, require('ast-types'), require('escodegen'), require('esprima'), require('estraverse'));
 	} else {
-		root.fancyscript = factory.call({}, root.acorn, root.astgen, root.escodegen, root.estraverse);
+		root.fancyscript = factory.call({}, root.types, root.escodegen, root.esprima, root.estraverse);
 	}
-})(this, function (acorn, ast, escodegen, estraverse) {
+})(this, function (types, escodegen, esprima, estraverse) {
+
+	var b = types.builders;
 
 	'use strict';
 
@@ -16,27 +18,27 @@
 		var rest = node.rest.name;
 		node.rest = null;
 		var length = node.params.length;
-		node.body.body.unshift(ast.variableDeclaration(
+		node.body.body.unshift(b.variableDeclaration(
 			'var',
-			[ ast.variableDeclarator(
-				ast.identifier(rest),
-				ast.callExpression(
-					ast.memberExpression(
-						ast.memberExpression(
-							ast.memberExpression(
-								ast.identifier('Array'),
-								ast.identifier('prototype'),
+			[ b.variableDeclarator(
+				b.identifier(rest),
+				b.callExpression(
+					b.memberExpression(
+						b.memberExpression(
+							b.memberExpression(
+								b.identifier('Array'),
+								b.identifier('prototype'),
 								false
 							),
-							ast.identifier('slice'),
+							b.identifier('slice'),
 							false
 						),
-						ast.identifier('call'),
+						b.identifier('call'),
 						false
 					),
 					[
-						ast.identifier('arguments'),
-						ast.literal(length)
+						b.identifier('arguments'),
+						b.literal(length)
 					]
 				)
 			) ]
@@ -51,8 +53,8 @@
 			body[body.length - 1].type !== 'ExpressionStatement')
 			return node;
 
-		body[body.length - 1] = ast.returnStatement(
-			ast.validate(body[body.length - 1].expression)
+		body[body.length - 1] = b.returnStatement(
+			body[body.length - 1].expression
 		);
 
 		return node;
@@ -69,35 +71,35 @@
 		 * => new (Function.prototype.bind.apply(Thing, [null].concat([a], b, [c])))
 		 */
 		if (!node.arguments.some(function (arg) {
-			return arg.type === 'SpreadExpression';
+			return arg.type === 'SpreadElement';
 		})) {
 			return node;
 		}
 
 		var args = [];
 		node.arguments.forEach(function (arg) {
-			if (arg.type === 'SpreadExpression') {
-				args.push(ast.validate(arg.argument));
+			if (arg.type === 'SpreadElement') {
+				args.push(arg.argument);
 			} else {
-				args.push(ast.arrayExpression([
-					ast.validate(arg)
+				args.push(b.arrayExpression([
+					arg
 				]));
 			}
 		});
 
 		if (node.type === 'CallExpression') {
-			return ast.callExpression(
-				ast.memberExpression(
-					ast.validate(node.callee),
-					ast.identifier('apply'),
+			return b.callExpression(
+				b.memberExpression(
+					node.callee,
+					b.identifier('apply'),
 					false
 				),
 				[
-					ast.validate(node.callee),
-					ast.callExpression(
-						ast.memberExpression(
-							ast.arrayExpression([]),
-							ast.identifier('concat'),
+					node.callee,
+					b.callExpression(
+						b.memberExpression(
+							b.arrayExpression([]),
+							b.identifier('concat'),
 							false
 						),
 						args
@@ -105,29 +107,29 @@
 				]
 			);
 		} else if (node.type === 'NewExpression') {
-			return ast.newExpression(
-				ast.callExpression(
-					ast.memberExpression(
-						ast.memberExpression(
-							ast.memberExpression(
-								ast.identifier('Function'),
-								ast.identifier('prototype'),
+			return b.newExpression(
+				b.callExpression(
+					b.memberExpression(
+						b.memberExpression(
+							b.memberExpression(
+								b.identifier('Function'),
+								b.identifier('prototype'),
 								false
 							),
-							ast.identifier('bind'),
+							b.identifier('bind'),
 							false
 						),
-						ast.identifier('apply'),
+						b.identifier('apply'),
 						false
 					),
 					[
-						ast.validate(node.callee),
-						ast.callExpression(
-							ast.memberExpression(
-								ast.arrayExpression([
-									ast.literal(null)
+						node.callee,
+						b.callExpression(
+							b.memberExpression(
+								b.arrayExpression([
+									b.literal(null)
 								]),
-								ast.identifier('concat'),
+								b.identifier('concat'),
 								false
 							),
 							args
@@ -140,7 +142,7 @@
 	}
 
 	var compile = function (src, options) {
-		var tree = acorn.parse(src);
+		var tree = esprima.parse(src);
 		tree = estraverse.replace(tree, {
 			enter: function (node) {
 				var res = node;
