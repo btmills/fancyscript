@@ -61,6 +61,7 @@
 	}
 
 	function compileArrowFunctionExpression (node) {
+		// TODO: Lexical this
 		return extend({}, node, {
 			type: 'FunctionExpression',
 			body: node.expression ?

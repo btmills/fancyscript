@@ -12,6 +12,18 @@ FancyScript aims to make developing in JavaScript easier and more powerful while
 
 ## Features
 
+### Arrow functions
+
+[Arrow functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/arrow_functions) in Harmony are a more concise syntax for function expressions, consisting of a parameter list and an automatically-returned expression or a statement block.
+
+```JavaScript
+[1, 2, 3, 4].map(x => x * x);
+=>
+[1, 2, 3, 4].map(function (x) {
+    return x * x;
+});
+```
+
 ### `fn` keyword
 
 `fn` is an alias to the `function` keyword and is interchangeable.
@@ -74,11 +86,9 @@ console.log.apply(console.log, [].concat(['a'], arr, ['e'])); // a b c d e
 ## Example
 
 ```JavaScript
-fn isEven (x, ...r) {
-    x % 2 === 0 && (r.length ? isEven(...r) : true)
-}
+var isEven = (x, ...r) => x % 2 === 0 && (r.length ? isEven(...r) : true)
 =>
-function isEven(x) {
+var isEven = function (x) {
     var r = Array.prototype.slice.call(arguments, 1);
     return x % 2 === 0 && (r.length ? isEven.apply(isEven, [].concat(r)) : true);
 }
