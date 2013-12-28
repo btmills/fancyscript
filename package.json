@@ -1,6 +1,14 @@
 {
   "name": "fancyscript",
   "version": "0.1.1",
+  "description": "Fancy JavaScript",
+  "keywords": [
+    "compiler",
+    "harmony",
+    "rest",
+    "spread",
+    "arrow"
+  ],
   "license": "BSD-3-Clause",
   "author": {
     "name": "Brandon Mills",
