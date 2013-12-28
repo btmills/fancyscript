@@ -1,12 +1,12 @@
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
-		define(['ast-types', 'escodegen', 'esprima', 'estraverse'], factory);
+		define(['ast-types', 'escodegen', 'esprima', 'estraverse', 'extend'], factory);
 	} else if (typeof exports === 'object') {
-		module.exports = factory.call({}, require('ast-types'), require('escodegen'), require('esprima'), require('estraverse'));
+		module.exports = factory.call({}, require('ast-types'), require('escodegen'), require('esprima'), require('estraverse'), require('extend'));
 	} else {
-		root.fancyscript = factory.call({}, root.types, root.escodegen, root.esprima, root.estraverse);
+		root.fancyscript = factory.call({}, root.types, root.escodegen, root.esprima, root.estraverse, root.extend);
 	}
-})(this, function (types, escodegen, esprima, estraverse) {
+})(this, function (types, escodegen, esprima, estraverse, extend) {
 
 	var b = types.builders;
 
@@ -58,6 +58,16 @@
 		);
 
 		return node;
+	}
+
+	function compileArrowFunctionExpression (node) {
+		return extend({}, node, {
+			type: 'FunctionExpression',
+			body: node.expression ?
+			      b.blockStatement([ b.returnStatement(node.body) ]) :
+			      node.body,
+			expression: false
+		});
 	}
 
 	function compileSpreadExpressionArgument (node) {
@@ -148,6 +158,9 @@
 				var res = node;
 
 				switch (node.type) {
+					case 'ArrowFunctionExpression':
+						res = compileArrowFunctionExpression(res);
+						// Fall through
 					case 'FunctionExpression': // Fall through
 					case 'FunctionDeclaration':
 						res = compileRestParameter(res);
