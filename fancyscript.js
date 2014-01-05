@@ -1,186 +1,104 @@
-(function (root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		define(['ast-types', 'escodegen', 'esprima', 'estraverse', 'extend'], factory);
-	} else if (typeof exports === 'object') {
-		module.exports = factory.call({}, require('ast-types'), require('escodegen'), require('esprima'), require('estraverse'), require('extend'));
-	} else {
-		root.fancyscript = factory.call({}, root.types, root.escodegen, root.esprima, root.estraverse, root.extend);
+(function () {
+
+'use strict';
+
+var util         = require('util');
+var b            = require('ast-types').builders;
+var escodegen    = require('escodegen');
+var esprima      = require('esprima');
+var estraverse   = require('estraverse');
+var extend       = require('extend');
+var jsonpath     = require('JSONPath').eval;
+var plugins      = require('./plugins');
+
+function Compiler () {
+	this.stack = [];
+	this.node = null;
+	this.topics = {};
+};
+
+// #on(topics, [filters,] callback)
+Compiler.prototype.on = function (topics, filter, callback) {
+	if (!Array.isArray(topics)) {
+		topics = [ topics ];
 	}
-})(this, function (types, escodegen, esprima, estraverse, extend) {
-
-	var b = types.builders;
-
-	'use strict';
-
-	function compileRestParameter (node) {
-		if (node.rest === null) return node;
-
-		var rest = node.rest.name;
-		node.rest = null;
-		var length = node.params.length;
-		node.body.body.unshift(b.variableDeclaration(
-			'var',
-			[ b.variableDeclarator(
-				b.identifier(rest),
-				b.callExpression(
-					b.memberExpression(
-						b.memberExpression(
-							b.memberExpression(
-								b.identifier('Array'),
-								b.identifier('prototype'),
-								false
-							),
-							b.identifier('slice'),
-							false
-						),
-						b.identifier('call'),
-						false
-					),
-					[
-						b.identifier('arguments'),
-						b.literal(length)
-					]
-				)
-			) ]
-		));
-		return node;
+	if (arguments.length === 2) {
+		callback = filter;
+		filter = null;
 	}
 
-	function compileAutomaticReturn (node) {
-		var body = node.body.body; // Function.body/BlockStatement.body
-
-		if (!body.length ||
-			body[body.length - 1].type !== 'ExpressionStatement')
-			return node;
-
-		body[body.length - 1] = b.returnStatement(
-			body[body.length - 1].expression
-		);
-
-		return node;
-	}
-
-	function compileArrowFunctionExpression (node) {
-		// TODO: Lexical this
-		return extend({}, node, {
-			type: 'FunctionExpression',
-			body: node.expression ?
-			      b.blockStatement([ b.returnStatement(node.body) ]) :
-			      node.body,
-			expression: false
-		});
-	}
-
-	function compileSpreadExpressionArgument (node) {
-		/*
-		 * callee(a, ...b, c)
-		 * => callee.apply(callee, Array.prototype.concat([a], b, [c]))
-		 * callee.call(scope, a, ...b, c)
-		 * => callee.apply(scope, Array.prototype.concat([a], b, [c]))
-		 * callee.apply not supported
-		 * new Thing(a, ...b, c)
-		 * => new (Function.prototype.bind.apply(Thing, [null].concat([a], b, [c])))
-		 */
-		if (!node.arguments.some(function (arg) {
-			return arg.type === 'SpreadElement';
-		})) {
-			return node;
+	var self = this;
+	topics.forEach(function (topic) {
+		if (!Array.isArray(self.topics[topic])) {
+			self.topics[topic] = [];
 		}
-
-		var args = [];
-		node.arguments.forEach(function (arg) {
-			if (arg.type === 'SpreadElement') {
-				args.push(arg.argument);
-			} else {
-				args.push(b.arrayExpression([
-					arg
-				]));
-			}
+		self.topics[topic].push({
+			filter: filter,
+			callback: callback
 		});
+	});
+};
 
-		if (node.type === 'CallExpression') {
-			return b.callExpression(
-				b.memberExpression(
-					node.callee,
-					b.identifier('apply'),
-					false
-				),
-				[
-					node.callee,
-					b.callExpression(
-						b.memberExpression(
-							b.arrayExpression([]),
-							b.identifier('concat'),
-							false
-						),
-						args
-					)
-				]
-			);
-		} else if (node.type === 'NewExpression') {
-			return b.newExpression(
-				b.callExpression(
-					b.memberExpression(
-						b.memberExpression(
-							b.memberExpression(
-								b.identifier('Function'),
-								b.identifier('prototype'),
-								false
-							),
-							b.identifier('bind'),
-							false
-						),
-						b.identifier('apply'),
-						false
-					),
-					[
-						node.callee,
-						b.callExpression(
-							b.memberExpression(
-								b.arrayExpression([
-									b.literal(null)
-								]),
-								b.identifier('concat'),
-								false
-							),
-							args
-						)
-					]
-				),
-				[]
-			);
+function test(filter, node) {
+	if (filter == null) return true; // null or undefined
+	if (typeof filter === 'function') return filter(node);
+	if (Array.isArray(filter)) return filter.every(function (path) {
+		var res = jsonpath(node, path);
+		return res && res.length;
+	});
+	if (typeof filter === 'object') return Object.keys(filter).every(function (path) {
+		var expected = filter[path];
+		var actual = jsonpath(node, path);
+		if (!(actual && actual.length && Array.isArray(actual))) return false;
+		if (expected === void 0) return true;
+		if (expected instanceof RegExp) return actual.some(expected.test);
+		return actual.some(function (val) { return expected === val; });
+	});
+	return true; // Match by default
+};
+
+Compiler.prototype.handle = function (node) {
+	if (!Array.isArray(this.topics[node.type])) return node;
+
+	var next, replacement;
+	var remaining = this.topics[node.type].slice();
+
+	while (remaining.length > 0) {
+		replacement = null;
+		next = remaining.shift();
+
+		if (test(next.filter, node)) {
+			replacement = next.callback(node);
+			if (replacement && replacement !== node) {
+				node = replacement;
+                return this.handle(node);
+			}
 		}
 	}
 
-	var compile = function (src, options) {
-		var tree = esprima.parse(src);
-		tree = estraverse.replace(tree, {
-			enter: function (node) {
-				var res = node;
+	return replacement || node;
+};
 
-				switch (node.type) {
-					case 'ArrowFunctionExpression':
-						res = compileArrowFunctionExpression(res);
-						// Fall through
-					case 'FunctionExpression': // Fall through
-					case 'FunctionDeclaration':
-						res = compileRestParameter(res);
-						res = compileAutomaticReturn(res);
-						break;
-					case 'CallExpression': // Fall through
-					case 'NewExpression':
-						res = compileSpreadExpressionArgument(res);
-						break;
-				}
+Compiler.prototype.parse = function (src, options) {
+	return esprima.parse(src);
+};
 
-				return res;
-			}
-		});
-		return escodegen.generate(tree);
-	};
+Compiler.prototype.compile = function (src, options) {
+	var self = this;
+	return escodegen.generate(estraverse.replace(self.parse(src, options), {
+		enter: function (node, parent) {
+			var replacement = self.handle(node);
+			self.stack.push(replacement);
+			return replacement;
+		},
+		leave: function (node, parent) {
+			self.stack.pop();
+		}
+	}));
+};
 
-	return {
-		compile: compile
-	};
+var compiler = new Compiler();
+plugins.init(compiler);
+module.exports = compiler;
 
-});
+}).call(this);
