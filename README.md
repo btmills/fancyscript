@@ -18,36 +18,11 @@ FancyScript aims to make developing in JavaScript easier and more powerful while
 
 ```JavaScript
 [1, 2, 3, 4].map(x => x * x);
-=>
+```
+```JavaScript
 [1, 2, 3, 4].map(function (x) {
     return x * x;
 });
-```
-
-### `fn` keyword
-
-`fn` is an alias to the `function` keyword and is interchangeable.
-
-```JavaScript
-fn hello () {
-    conole.log('Hello, world!');
-}
-=>
-function hello () {
-    console.log('Hello, world!');
-}
-```
-
-### Automatic return values
-
-If the last statement of a function is an expression contained in an ExpressionStatement, it is automatically returned.
-
-```JavaScript
-fn isEven (x) { x % 2 === 0 }
-=>
-function isEven(x) {
-    return x % 2 === 0;
-}
 ```
 
 ### Rest parameters
@@ -58,7 +33,8 @@ From the [MDN page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 fn isEven (...x) {
     x.every(fn (x) { x % 2 === 0 });
 }
-=>
+```
+```JavaScript
 function isEven() {
     var x = Array.prototype.slice.call(arguments, 0);
     return x.every(function (x) {
@@ -76,18 +52,74 @@ From the [MDN page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ```JavaScript
 var arr = ['b', 'c', 'd'];
 console.log('a', ...arr, 'e');
-=>
+```
+```JavaScript
 var arr = ['b', 'c', 'd'];
 console.log.apply(console.log, [].concat(['a'], arr, ['e'])); // a b c d e
 ```
 
 *Note that support for the spread operator in a call to `Function.prototype.apply` is neither available nor planned. A compelling use case would be needed.*
 
+### Array destructuring
+
+[Array destructuring](http://wiki.ecmascript.org/doku.php?id=harmony:destructuring) can occur in variable declarations, assignment expressions, or function parameters.
+
+```JavaScript
+var [a, b] = [11, 42];
+console.log([a, b] = [b, a]); // [42, 11]
+function show([, second]) {
+    console.log(second);
+}
+show([a, b]); // 11
+```
+```JavaScript
+var $tmp = [11, 42], a = $tmp[0], b = $tmp[1];
+console.log(function ($tmp) {
+    a = $tmp[0];
+    b = $tmp[1];
+    return [a, b];
+}([b, a]));
+function show($tmp) {
+    var second = $tmp[1];
+    return console.log(second);
+}
+show([a, b]);
+```
+
+### Automatic return values
+
+If the last statement of a function is an expression contained in an ExpressionStatement, it is automatically returned.
+
+```JavaScript
+fn isEven (x) { x % 2 === 0 }
+```
+```JavaScript
+function isEven(x) {
+    return x % 2 === 0;
+}
+```
+
+### `fn` keyword
+
+`fn` is an alias to the `function` keyword and is interchangeable.
+
+```JavaScript
+fn hello () {
+    conole.log('Hello, world!');
+}
+```
+```JavaScript
+function hello () {
+    console.log('Hello, world!');
+}
+```
+
 ## Example
 
 ```JavaScript
 var isEven = (x, ...r) => x % 2 === 0 && (r.length ? isEven(...r) : true)
-=>
+```
+```JavaScript
 var isEven = function (x) {
     var r = Array.prototype.slice.call(arguments, 1);
     return x % 2 === 0 && (r.length ? isEven.apply(isEven, [].concat(r)) : true);

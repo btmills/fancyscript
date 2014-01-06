@@ -7,7 +7,8 @@
     "harmony",
     "rest",
     "spread",
-    "arrow"
+    "arrow",
+    "destructuring"
   ],
   "license": "BSD-3-Clause",
   "author": {
