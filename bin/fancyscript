@@ -20,6 +20,7 @@ program
 	.version(package.version)
 	.usage('[options] <scripts ...>')
 	.option('-w, --watch', 'watch for file changes')
+	.option('-b, --bare', 'compile without a top-level function wrapper')
 	.option('-o, --out <directory>', 'set output directory', String)
 	.parse(process.argv);
 
@@ -314,7 +315,8 @@ function timeLog(message) {
 function compileOptions(filename, base) {
 	var cwd, jsPath, jsDir;
 	var answer = {
-		filename: filename
+		filename: filename,
+		bare: program.bare
 	};
 
 	if (filename) {

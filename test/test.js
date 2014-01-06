@@ -5,15 +5,19 @@ var fancyscript = require('../fancyscript');
 var passed = 0;
 var failed = 0;
 
-function test(message, fs, js) {
+function test(message, fs, js, options) {
+	options = options || {
+		bare: true
+	};
 	try {
-		var compiled = esprima.parse(fancyscript.compile(fs));
+		var compiled = fancyscript.compile(fs, options);
 		var expected = esprima.parse(js);
 
-		var diff = jsdiff.diffString(expected, compiled);
+		var diff = jsdiff.diffString(expected, esprima.parse(compiled));
 		if (!diff || diff === ' undefined\n') {
 			passed += 1;
 		} else {
+			console.log(compiled);
 			failed += 1;
 			console.log(message);
 			console.log(diff);
@@ -23,6 +27,15 @@ function test(message, fs, js) {
 		failed += 1;
 	}
 }
+
+test('strict',
+	'var foo = 42;',
+	'(function () {' +
+		"'use strict';" +
+		'var foo = 42;' +
+	'}).call(this);',
+	{ bare: false }
+);
 
 test('fn keyword',
 	'fn hello() {}',

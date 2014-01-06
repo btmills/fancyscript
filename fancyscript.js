@@ -10,11 +10,16 @@ var estraverse   = require('estraverse');
 var extend       = require('extend');
 var jsonpath     = require('JSONPath').eval;
 var plugins      = require('./plugins');
+var escope       = require('escope');
 
 function Compiler () {
 	this.stack = [];
 	this.node = null;
 	this.topics = {};
+	this.defaults = {
+		bare: false
+	};
+	this.options = extend({}, this.defaults);
 };
 
 // #on(topics, [filters,] callback)
@@ -83,9 +88,17 @@ Compiler.prototype.parse = function (src, options) {
 	return esprima.parse(src);
 };
 
+function inspect(obj) {
+	console.log(require('util').inspect(obj, { colors: true, depth: 99 }));
+	return obj;
+}
+
 Compiler.prototype.compile = function (src, options) {
+	this.options = extend({}, this.defaults, options);
 	var self = this;
-	return escodegen.generate(estraverse.replace(self.parse(src, options), {
+	var tree = self.parse(src, options);
+	//inspect(escope.analyze(tree).scopes);
+	return escodegen.generate(estraverse.replace(tree, {
 		enter: function (node, parent) {
 			var replacement = self.handle(node);
 			self.stack.push(replacement);

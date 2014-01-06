@@ -6,9 +6,14 @@ FancyScript aims to make developing in JavaScript easier and more powerful while
 
 ## Usage
 
-`npm install -g fancyscript`
+`npm install -g fancyscript` installs the FancyScript binary `fancy` so it can be used globally.
 
-`fancy input.fs` compiles the FancyScript source file `input.fs` to plain JavaScript in `input.js`. More options will be added to the compiler later.
+`fancy input.fs` compiles the FancyScript source file `input.fs` to plain JavaScript in `input.js`.
+
+#### Options
+
+- `-w, --watch` Watch specified files for changes.
+- `-b, --bare` Compile without a top-level function wrapper.
 
 ## Features
 
