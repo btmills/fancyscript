@@ -36,7 +36,8 @@
     "commander": "*",
     "mkdirp": "*",
     "extend": "*",
-    "JSONPath": "*"
+    "JSONPath": "*",
+    "escope": "*"
   },
   "devDependencies": {
     "json-diff": "~0.3.1"

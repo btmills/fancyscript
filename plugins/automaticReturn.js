@@ -4,7 +4,6 @@
 
 var extend = require('extend');
 var b = require('ast-types').builders;
-var jsonpath = require('jsonpath').eval;
 
 module.exports = function (compiler) {
 
