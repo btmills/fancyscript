@@ -64,4 +64,13 @@ test('array destructuring function parameters',
 	'}'
 );
 
+test('array destructuring assignment',
+	'[a, b] = [b, a];',
+	'(function ($fsadtmp4) {' +
+		'a = $fsadtmp4[0];' +
+		'b = $fsadtmp4[1];' +
+		'return [a, b];' +
+	'})([b, a]);'
+);
+
 console.log([passed, 'of', passed + failed, 'passed'].join(' '));
