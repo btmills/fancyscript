@@ -42,6 +42,45 @@ module.exports = function (compiler) {
 		return replacement;
 	});
 
+	// [a, b] = [b, a];
+
+	// try {...} catch ([a, b]) {...}
+
+	// function ([a, b], c) {...}
+	compiler.on(['FunctionDeclaration', 'FunctionExpression'], {
+		'$.params[*].type': 'ArrayPattern'
+	}, function (node) {
+		var replacement = extend({}, node, { params: [] });
+		var temps = {};
+		node.params.forEach(function (param) {
+			if (param.type !== 'ArrayPattern') {
+				replacement.params.push(param);
+			} else {
+				var temp = '$fsadtmp' + counter++;
+				replacement.params.push(b.identifier(temp));
+				temps[temp] = param;
+			}
+		});
+		Object.keys(temps).forEach(function (temp) {
+			var param = temps[temp];
+			replacement.body.body.unshift(b.variableDeclaration(
+				'var',
+				param.elements.map(function (id, index) {
+					if (id === null) return null;
+					return b.variableDeclarator(
+						id,
+						b.memberExpression(
+							b.identifier(temp),
+							b.literal(index),
+							true
+						)
+					);
+				}).filter(function (node) { return node !== null; })
+			));
+		});
+		return replacement;
+	});
+
 };
 
 }).call(this);

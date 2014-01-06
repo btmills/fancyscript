@@ -52,9 +52,16 @@ test('spread argument',
 	'foo.apply(foo, [].concat([a], [b], bar));'
 );
 
-test('array assignment destructuring declaration',
-	'var [a, b] = [1, 2], c = 4, [d, e] = foo(); var [f] = car;',
-	'var $fsadtmp0 = [1, 2], a = $fsadtmp0[0], b = $fsadtmp0[1], c = 4, $fsadtmp1 = foo(), d = $fsadtmp1[0], e = $fsadtmp1[1]; var $fsadtmp2 = car, f = $fsadtmp2[0];'
+test('array destructuring variable declarations',
+	'var [a, , b] = [1, 2, 3], c = 4, [d, e] = foo(); var [f] = car;',
+	'var $fsadtmp0 = [1, 2, 3], a = $fsadtmp0[0], b = $fsadtmp0[2], c = 4, $fsadtmp1 = foo(), d = $fsadtmp1[0], e = $fsadtmp1[1]; var $fsadtmp2 = car, f = $fsadtmp2[0];'
+);
+
+test('array destructuring function parameters',
+	'function foo(a, [b, , c], d) {}',
+	'function foo(a, $fsadtmp3, d) {' +
+		'var b = $fsadtmp3[0], c = $fsadtmp3[2];' +
+	'}'
 );
 
 console.log([passed, 'of', passed + failed, 'passed'].join(' '));
