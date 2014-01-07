@@ -22,9 +22,9 @@
     "type": "git",
     "url": "https://github.com/btmills/fancyscript.git"
   },
-  "main": "./fancyscript.js",
+  "main": "./index.js",
   "bin": {
-    "fancy": "./bin/fancyscript"
+    "fancy": "./bin/fancy"
   },
   "scripts": {
     "test": "node test/test.js"

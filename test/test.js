@@ -1,6 +1,6 @@
 var esprima = require('esprima');
 var jsdiff = require('json-diff');
-var fancyscript = require('../fancyscript');
+var fancyscript = require('../index');
 
 var passed = 0;
 var failed = 0;
