@@ -101,10 +101,7 @@ function compilePath(source, isTopLevel, base) {
 	}
 }
 
-function compileScript(file, input, base) {
-	if (arguments.length < 3) {
-		base = null;
-	}
+function compileScript(file, input, base = null) {
 
 	var js, message;
 	var options = compileOptions(file, base);
@@ -254,12 +251,10 @@ function silentUnlink(path) {
 	}
 }
 
-function baseFileName(file, stripExt, useWinPathSep) {
-	if (arguments.length < 2) stripExt = false;
-	if (arguments.length < 3) useWinPathSep = false;
-
+function baseFileName(file, stripExt = false, useWinPathSep = false) {
 	var pathSep = useWinPathSep ? /\\|\// : /\//
 	var parts = file.split(pathSep);
+
 	file = parts[parts.length - 1];
 	if (!(stripExt && file.indexOf('.') >= 0)) return file;
 	parts = file.split('.');
@@ -268,12 +263,11 @@ function baseFileName(file, stripExt, useWinPathSep) {
 	return parts.join('.');
 }
 
-function outputPath(source, base, extension) {
-	if (arguments.length < 3) extension = '.js';
-
+function outputPath(source, base, extension = '.js') {
 	var dir;
 	var basename = baseFileName(source, true, useWinPathSep);
 	var srcDir = path.dirname(source);
+
 	if (!program.out) {
 		dir = srcDir;
 	} else if (source === base) {
@@ -286,6 +280,7 @@ function outputPath(source, base, extension) {
 
 function writeJs(base, sourcePath, js, jsPath) {
 	var jsDir = path.dirname(jsPath);
+
 	function compile() {
 		if (js.length <= 0) js = ' ';
 		fs.writeFile(jsPath, js, function (err) {
@@ -296,6 +291,7 @@ function writeJs(base, sourcePath, js, jsPath) {
 			}
 		});
 	}
+
 	fs.exists(jsDir, function (exists) {
 		if (exists) {
 			compile();
