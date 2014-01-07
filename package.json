@@ -27,6 +27,7 @@
     "fancy": "./bin/fancy"
   },
   "scripts": {
+    "build": "./bin/fancy -o lib src",
     "test": "node test/test.js"
   },
   "dependencies": {
