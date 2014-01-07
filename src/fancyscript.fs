@@ -40,17 +40,17 @@ Compiler.prototype.on = function (topics, filter, callback) {
 function test(filter, node) {
 	if (filter == null) return true; // null or undefined
 	if (typeof filter === 'function') return filter(node);
-	if (Array.isArray(filter)) return filter.every(path => {
+	if (Array.isArray(filter)) return filter.every(function (path) {
 		var res = jsonpath(node, path);
 		return res && res.length;
 	});
-	if (typeof filter === 'object') return Object.keys(filter).every(path => {
+	if (typeof filter === 'object') return Object.keys(filter).every(function (path) {
 		var expected = filter[path];
 		var actual = jsonpath(node, path);
 		if (!(actual && actual.length && Array.isArray(actual))) return false;
 		if (expected === void 0) return true;
 		if (expected instanceof RegExp) return actual.some(expected.test);
-		return actual.some(val => expected === val);
+		return actual.some(function (val) { return expected === val; });
 	});
 	return true; // Match by default
 };
@@ -82,7 +82,7 @@ Compiler.prototype.parse = function (src, options) {
 };
 
 Compiler.prototype.compile = function (src, options) {
-	this.options = extend({}, this.defualts, options);
+	this.options = extend({}, this.defaults, options);
 	var self = this;
 	var tree = this.parse(src, options);
 	return escodegen.generate(estraverse.replace(tree, {
