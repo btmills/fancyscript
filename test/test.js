@@ -28,6 +28,14 @@ function test(message, fs, js, options) {
 	}
 }
 
+test('default arguments',
+	'function foo(a, b = 42, c, d = bar(), e) {}',
+	'function foo(a, b, c, d, e) {' +
+		'if (typeof b === \'undefined\') { b = 42; }' +
+		'if (typeof d === \'undefined\') { d = bar(); }' +
+	'}'
+);
+
 test('strict',
 	'var foo = 42;',
 	'(function () {' +
