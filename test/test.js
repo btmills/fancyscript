@@ -94,4 +94,16 @@ test('array destructuring assignment',
 	'})([b, a]);'
 );
 
+test('object destructuring variable declarations',
+	'var { name, age: a } = foo();',
+	'var $fsodtmp0 = foo(), name = $fsodtmp0[\'name\'], a = $fsodtmp0[\'age\'];'
+);
+
+test('object destructuring function parameters',
+	'function foo(a, { name, age: b }, c) {}',
+	'function foo(a, $fsodtmp1, c) {' +
+		'var name = $fsodtmp1[\'name\'], b = $fsodtmp1[\'age\'];' +
+	'}'
+);
+
 console.log([passed, 'of', passed + failed, 'passed'].join(' '));

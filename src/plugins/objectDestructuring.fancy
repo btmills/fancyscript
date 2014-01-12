@@ -1,0 +1,92 @@
+var extend = require('extend');
+var b = require('ast-types').builders;
+
+/*
+Can appear on the LHS of '=' in the following contexts:
+- Plain assignment expression
+- var, let, or const initializer expression
+- let expression or statement initializer (not implemented)
+- for statement initializer (not implemented)
+
+1. Evaluate E yielding a value V
+2. Assign V to a fresh temporary T
+4. If P is an object pattern then
+   Taking each field F with name Q at the top level of P in order
+   a. If the right-hand-side of F is an lvalue N
+      Perform N = T.Q
+   b. Else the right-hand-side of F is a pattern P’
+      Destructure P’ and T.Q according to this algorithm (from step 2)
+5. Return T
+*/
+
+module.exports = function (compiler) {
+
+	// TODO: This is a terrible and hacky way of generating unique temporary
+	// variable names. Fix it.
+	var counter = 0;
+
+	compiler.on('VariableDeclaration', {
+		'$.declarations[*].id.type': 'ObjectPattern'
+	}, function (node) {
+		var replacement = extend({}, node, { declarations: [] });
+		node.declarations.forEach(function (declaration) {
+			if (declaration.id.type !== 'ObjectPattern') {
+				replacement.declarations.push(declaration);
+			} else {
+				var temp = '$fsodtmp' + counter++;
+				replacement.declarations.push(b.variableDeclarator(
+					b.identifier(temp),
+					declaration.init
+				));
+				declaration.id.properties.forEach(function (prop) {
+					replacement.declarations.push(b.variableDeclarator(
+						prop.value,
+						b.memberExpression(
+							b.identifier(temp),
+							b.literal(prop.key.name),
+							true
+						)
+					));
+				});
+			}
+		});
+		return replacement;
+	});
+
+	// TODO: { a, b } = foo();
+
+	// function foo({a, b}) { }
+	compiler.on(['FunctionDeclaration', 'FunctionExpression'], function (node) {
+		return node.params.some(param => param.type === 'ObjectPattern');
+	}, function (node) {
+		var replacement = extend({}, node, { params: [] });
+		var temps = {};
+		node.params.forEach(function (param) {
+			if (param.type !== 'ObjectPattern') {
+				replacement.params.push(param);
+			} else {
+				var temp = '$fsodtmp' + counter++;
+				replacement.params.push(b.identifier(temp));
+				temps[temp] = param;
+			}
+		});
+		Object.keys(temps).reverse().forEach(function (temp) {
+			var param = temps[temp];
+			replacement.body.body.unshift(b.variableDeclaration(
+				'var',
+				param.properties.map(function (prop, index) {
+					return b.variableDeclarator(
+						prop.value,
+						b.memberExpression(
+							b.identifier(temp),
+							b.literal(prop.key.name),
+							true
+						)
+					);
+				})
+			));
+		});
+		return replacement;
+	});
+
+};
