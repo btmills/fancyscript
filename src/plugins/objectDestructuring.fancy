@@ -56,8 +56,8 @@ module.exports = function (compiler) {
 	// TODO: { a, b } = foo();
 
 	// function foo({a, b}) { }
-	compiler.on(['FunctionDeclaration', 'FunctionExpression'], function (node) {
-		return node.params.some(param => param.type === 'ObjectPattern');
+	compiler.on(['FunctionDeclaration', 'FunctionExpression'], {
+		'$.params[*].type': 'ObjectPattern'
 	}, function (node) {
 		var replacement = extend({}, node, { params: [] });
 		var temps = {};

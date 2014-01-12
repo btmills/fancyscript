@@ -106,4 +106,9 @@ test('object destructuring function parameters',
 	'}'
 );
 
+test('object expression shorthand',
+	'var obj = { a, b: foo(), c };',
+	'var obj = { a: a, b: foo(), c: c};'
+);
+
 console.log([passed, 'of', passed + failed, 'passed'].join(' '));

@@ -1,0 +1,14 @@
+var extend = require('extend');
+var b = require('ast-types').builders;
+
+module.exports = function (compiler) {
+
+	compiler.on('ObjectExpression', {
+		'$.properties[*].shorthand': true
+	}, function (node) {
+		var replacement = extend({}, node);
+		replacement.properties.forEach(prop => prop.shorthand = false);
+		return replacement;
+	});
+
+};
