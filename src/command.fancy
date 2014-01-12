@@ -38,7 +38,7 @@ function isHidden(file) {
 }
 
 function isFancyScript(file) {
-	return path.extname(file) === '.fancy';
+	return path.extname(file) === '.fs';
 }
 
 function compilePath(source, isTopLevel, base) {
