@@ -91,6 +91,23 @@ function show($tmp) {
 show([a, b]);
 ```
 
+### Object destructuring
+
+Like array destructuring, object destructuring is syntactic sugar for more easily creating objects or retrieving values from them. This can occur in variable declarations, function parameter lists, or as a shortcut in object expressions.
+
+```JavaScript
+var { name, age: a } = getPerson(); // Declare variables "name" and "a"
+var obj = { name, age: a }; // Shortcut to initialize obj.name to variable "name"
+function ({ name, age: b}, cb) { }
+```
+```JavaScript
+var $tmp = getPerson(), name = $tmp['name'], a = $tmp['age'];
+var obj = { name: name, age: a };
+function ($tmp2, cb) {
+    var name = $tmp2['name'], b = $tmp2['age'];
+}
+```
+
 ### Automatic return values
 
 If the last statement of a function is an expression contained in an ExpressionStatement, it is automatically returned.
