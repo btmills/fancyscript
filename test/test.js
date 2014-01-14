@@ -90,7 +90,7 @@ test('array destructuring assignment',
 	'(function ($fsadtmp4) {' +
 		'a = $fsadtmp4[0];' +
 		'b = $fsadtmp4[1];' +
-		'return [a, b];' +
+		'return $fsadtmp4;' +
 	'})([b, a]);'
 );
 

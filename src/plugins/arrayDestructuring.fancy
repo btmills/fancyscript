@@ -43,7 +43,7 @@ module.exports = function (compiler) {
 	// (function ($tmp) {
 	// 	a = $tmp[0];
 	// 	b = $tmp[1];
-	// 	return [a, b];
+	// 	return $tmp;
 	// })([b, a])
 	compiler.on('AssignmentExpression', {
 		'$.left.type': 'ArrayPattern'
@@ -69,7 +69,7 @@ module.exports = function (compiler) {
 				}).filter(stmt => stmt !== null).concat([
 					// One assignment for each element
 					b.returnStatement(
-						b.arrayExpression(node.left.elements)
+						b.identifier(temp)
 					)
 				]))
 			),
