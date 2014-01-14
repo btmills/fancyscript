@@ -106,6 +106,15 @@ test('object destructuring function parameters',
 	'}'
 );
 
+test('object destructuring assignment',
+	'({ name, age: b }) = foo();',
+	'(function ($fsodtmp2) {' +
+		'name = $fsodtmp2[\'name\'];' +
+		'b = $fsodtmp2[\'age\'];' +
+		'return $fsodtmp2;' +
+	'})(foo());'
+);
+
 test('object expression shorthand',
 	'var obj = { a, b: foo(), c };',
 	'var obj = { a: a, b: foo(), c: c};'

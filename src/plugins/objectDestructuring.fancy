@@ -53,7 +53,43 @@ module.exports = function (compiler) {
 		return replacement;
 	});
 
-	// TODO: { a, b } = foo();
+	// ({ a, b }) = foo();
+	// (function ($tmp) {
+	// 	a = $tmp['a'];
+	// 	b = $tmp['b'];
+	// 	return $tmp;
+	// })(foo())
+	compiler.on('AssignmentExpression', {
+		'$.left.type': 'ObjectPattern'
+	}, function (node) {
+		var temp = '$fsodtmp' + counter++;
+		var replacement = b.callExpression(
+			b.functionExpression( // "id", "params", "body", "generator", "expression"
+				null, // id
+				[ b.identifier(temp) ], // params
+				b.blockStatement(node.left.properties.map(function (prop) {
+					return b.expressionStatement(
+						b.assignmentExpression(
+							'=',
+							extend({}, prop.value),
+							b.memberExpression(
+								b.identifier(temp),
+								b.literal(prop.key.name),
+								true
+							)
+						)
+					);
+				}).concat([
+					// One assignment for each element
+					b.returnStatement(
+						b.identifier(temp)
+					)
+				]))
+			),
+			[ extend({}, node.right) ]
+		);
+		return replacement;
+	});
 
 	// function foo({a, b}) { }
 	compiler.on(['FunctionDeclaration', 'FunctionExpression'], {
