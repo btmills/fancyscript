@@ -82,7 +82,7 @@ var $tmp = [11, 42], a = $tmp[0], b = $tmp[1];
 console.log(function ($tmp) {
     a = $tmp[0];
     b = $tmp[1];
-    return [a, b];
+    return $tmp;
 }([b, a]));
 function show($tmp) {
     var second = $tmp[1];
@@ -99,6 +99,7 @@ Like array destructuring, object destructuring is syntactic sugar for more easil
 var { name, age: a } = getPerson(); // Declare variables "name" and "a"
 var obj = { name, age: a }; // Shortcut to initialize obj.name to variable "name"
 function ({ name, age: b}, cb) { }
+{ name, age: a } = getAnotherPerson();
 ```
 ```JavaScript
 var $tmp = getPerson(), name = $tmp['name'], a = $tmp['age'];
@@ -106,6 +107,11 @@ var obj = { name: name, age: a };
 function ($tmp2, cb) {
     var name = $tmp2['name'], b = $tmp2['age'];
 }
+(function ($tmp3) {
+    name = $tmp3['name'];
+    a = $tmp3['age'];
+    return $tmp3;
+})(getAnotherPerson());
 ```
 
 ### Automatic return values
