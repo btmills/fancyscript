@@ -99,7 +99,7 @@ Like array destructuring, object destructuring is syntactic sugar for more easil
 var { name, age: a } = getPerson(); // Declare variables "name" and "a"
 var obj = { name, age: a }; // Shortcut to initialize obj.name to variable "name"
 function ({ name, age: b}, cb) { }
-{ name, age: a } = getAnotherPerson();
+({ name, age: a }) = getAnotherPerson();
 ```
 ```JavaScript
 var $tmp = getPerson(), name = $tmp['name'], a = $tmp['age'];
