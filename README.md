@@ -12,10 +12,26 @@ FancyScript aims to make developing in JavaScript easier and more powerful while
 
 #### Options
 
-- `-w, --watch` Watch specified files for changes.
 - `-b, --bare` Compile without a top-level function wrapper.
+- `-o, --out [DIR]` Write all compiled JavaScript files into the specified directory.
+- `-r, --repl` Start an interactive FancyScript REPL. Interrupts all other options.
+- `-w, --watch` Watch specified files for changes.
 
 ## Features
+
+### Strict by default
+
+FancyScript follows strict-mode JavaScript conventions. Unless the `--bare` option is passed, the compiled code is wrapped in an [IIFE](http://benalman.com/news/2010/11/immediately-invoked-function-expression/) (Immediately-Invoked Function Expression) with `"use strict";` inside. For the sake of clarity, other examples will not include the function wrapper and strict mode declaration.
+
+```JavaScript
+var a = 42;
+```
+```JavaScript
+(function () {
+    "use strict";
+    var a = 42;
+}).call(this);
+```
 
 ### Arrow functions
 
@@ -28,6 +44,20 @@ FancyScript aims to make developing in JavaScript easier and more powerful while
 [1, 2, 3, 4].map(function (x) {
     return x * x;
 });
+```
+
+### Default arguments
+
+Use default arguments to provide a default value within the function's parameter list for any optional arguments.
+
+```JavaScript
+function foo(a, b = 42, c, d = bar(), e) { }
+```
+```JavaScript
+function foo(a, b, c, d, e) {
+    if (typeof b === 'undefined') { b = 42; }
+    if (typeof d === 'undefined') { d = bar(); }
+}
 ```
 
 ### Rest parameters
