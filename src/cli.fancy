@@ -4,7 +4,7 @@ var program = require('commander');
 var extend = require('extend');
 var mkdirp = require('mkdirp');
 var fancyscript = require('./fancyscript');
-var packagejson = require('../package.json');
+var pkg = require('../package.json');
 
 var useWinPathSep = path.sep === '\\';
 
@@ -15,7 +15,7 @@ var watchedDirs = {};
 
 
 program
-	.version(packagejson.version)
+	.version(pkg.version)
 	.usage('[options] <scripts ...>')
 	.option('-b, --bare', 'compile without a top-level function wrapper')
 	//.option('-c, --compile', 'compile to JavaScript and save as .js files')
