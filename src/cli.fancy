@@ -17,19 +17,27 @@ var watchedDirs = {};
 program
 	.version(packagejson.version)
 	.usage('[options] <scripts ...>')
-	.option('-w, --watch', 'watch for file changes')
 	.option('-b, --bare', 'compile without a top-level function wrapper')
+	//.option('-c, --compile', 'compile to JavaScript and save as .js files')
+	.option('-r, --repl', 'start an interactive FancyScript REPL')
 	.option('-o, --out <directory>', 'set output directory', String)
+	.option('-w, --watch', 'watch for file changes')
 	.parse(process.argv);
 
-if (program.out) {
-	program.out = path.resolve(program.out);
-}
+module.exports.run = function () {
+	if (program.repl) {
+		return require('./repl').start();
+	}
 
-program.args.forEach(function (source) {
-	source = path.resolve(source);
-	compilePath(source, true, source);
-});
+	if (program.out) {
+		program.out = path.resolve(program.out);
+	}
+
+	program.args.forEach(function (source) {
+		source = path.resolve(source);
+		compilePath(source, true, source);
+	});
+}
 
 
 
@@ -103,11 +111,13 @@ function compilePath(source, isTopLevel, base) {
 
 function compileScript(file, input, base = null) {
 
-	var js, message;
+	var fsAst, js, jsAst, message;
 	var options = compileOptions(file, base);
 
 	try {
-		js = fancyscript.compile(input, options);
+		fsAst = fancyscript.parse(input, options);
+		jsAst = fancyscript.compile(fsAst, options);
+		js = fancyscript.js(jsAst, options);
 		writeJs(base, file, js, options.jsPath);
 	} catch (err) {
 		message = err.stack || err;

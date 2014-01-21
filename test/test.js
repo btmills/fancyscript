@@ -10,14 +10,16 @@ function test(message, fs, js, options) {
 		bare: true
 	};
 	try {
-		var compiled = fancyscript.compile(fs, options);
-		var expected = esprima.parse(js);
+		var fsAst = fancyscript.parse(fs, options);
+		var jsAst = fancyscript.compile(fsAst, options);
+		var actualJs = fancyscript.js(jsAst, options);
+		var expectedJsAst = esprima.parse(js);
 
-		var diff = jsdiff.diffString(expected, esprima.parse(compiled));
+		var diff = jsdiff.diffString(expectedJsAst, esprima.parse(actualJs));
 		if (!diff || diff === ' undefined\n') {
 			passed += 1;
 		} else {
-			console.log(compiled);
+			console.log(jsAst);
 			failed += 1;
 			console.log(message);
 			console.log(diff);
