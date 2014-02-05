@@ -1,27 +1,27 @@
-# FancyScript
+# FancierScript
 
-*Fancy JavaScript*
+*Fancier JavaScript, because FancyScript just wasn't fancy enough.*
 
-FancyScript aims to make developing in JavaScript easier and more powerful while remaining "just JavaScript". For a completely different approach with diverse syntax rules, and in the latter case, a powerful standard library, look toward [CoffeeScript](https://github.com/jashkenas/coffee-script/) or [ClojureScript](https://github.com/clojure/clojurescript). FancyScript compiles to plain ES5 JavaScript. Thanks [@tarebyte](https://github.com/tarebyte) for the name.
+FancierScript aims to make developing in JavaScript easier and more powerful while remaining "just JavaScript". For a completely different approach with diverse syntax rules, and in the latter case, a powerful standard library, look toward [CoffeeScript](https://github.com/jashkenas/coffee-script/) or [ClojureScript](https://github.com/clojure/clojurescript). FancierScript compiles to plain ES5 JavaScript. Thanks [@tarebyte](https://github.com/tarebyte) for the name.
 
 ## Usage
 
-`npm install -g fancyscript` installs the FancyScript binary `fancy` so it can be used globally.
+`npm install -g fancierscript` installs the FancierScript binary `fancier` so it can be used globally.
 
-`fancy input.fs` compiles the FancyScript source file `input.fs` to plain JavaScript in `input.js`.
+`fancier input.fs` compiles the FancierScript source file `input.fs` to plain JavaScript in `input.js`.
 
 #### Options
 
 - `-b, --bare` Compile without a top-level function wrapper.
 - `-o, --out [DIR]` Write all compiled JavaScript files into the specified directory.
-- `-r, --repl` Start an interactive FancyScript REPL. Interrupts all other options.
+- `-r, --repl` Start an interactive FancierScript REPL. Interrupts all other options.
 - `-w, --watch` Watch specified files for changes.
 
 ## Features
 
 ### Strict by default
 
-FancyScript follows strict-mode JavaScript conventions. Unless the `--bare` option is passed, the compiled code is wrapped in an [IIFE](http://benalman.com/news/2010/11/immediately-invoked-function-expression/) (Immediately-Invoked Function Expression) with `"use strict";` inside. For the sake of clarity, other examples will not include the function wrapper and strict mode declaration.
+FancierScript follows strict-mode JavaScript conventions. Unless the `--bare` option is passed, the compiled code is wrapped in an [IIFE](http://benalman.com/news/2010/11/immediately-invoked-function-expression/) (Immediately-Invoked Function Expression) with `"use strict";` inside. For the sake of clarity, other examples will not include the function wrapper and strict mode declaration.
 
 ```JavaScript
 var a = 42;
