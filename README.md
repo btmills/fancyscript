@@ -2,7 +2,7 @@
 
 *Fancier JavaScript, because FancyScript just wasn't fancy enough.*
 
-FancierScript aims to make developing in JavaScript easier and more powerful while remaining "just JavaScript". For a completely different approach with diverse syntax rules, and in the latter case, a powerful standard library, look toward [CoffeeScript](https://github.com/jashkenas/coffee-script/) or [ClojureScript](https://github.com/clojure/clojurescript). FancierScript compiles to plain ES5 JavaScript. Thanks [@tarebyte](https://github.com/tarebyte) for the name.
+FancierScript aims to make developing in JavaScript easier and more powerful while remaining "just JavaScript". For a completely different approach with diverse syntax rules, and in the latter case, a powerful standard library, look toward [CoffeeScript](https://github.com/jashkenas/coffee-script/) or [ClojureScript](https://github.com/clojure/clojurescript). FancierScript compiles to plain ES5 JavaScript. Thanks [@btmills](https://github.com/btmills) (Ironic, isn't it?) for the name.
 
 ## Usage
 
